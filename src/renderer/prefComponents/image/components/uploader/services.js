@@ -43,6 +43,14 @@ const services = {
     privacyUrl: '',
     tosUrl: '',
     agreedToLegalNotices: true
+  },
+
+  ipfsCrust: {
+    name: 'Crust IPFS',
+    isGdprCompliant: true,
+    privacyUrl: '',
+    tosUrl: '',
+    agreedToLegalNotices: true
   }
 }
 

@@ -8,6 +8,8 @@ import dayjs from 'dayjs'
 import { Octokit } from '@octokit/rest'
 import { isImageFile } from 'common/filesystem/paths'
 import { isWindows } from './index'
+import { uploadToIpfsCrust } from './ipfsCrust'
+// import { fromBuffer } from 'file-type'
 
 export const create = async (pathname, type) => {
   return type === 'directory'
@@ -149,6 +151,17 @@ export const uploadImage = async (pathname, image, preferences) => {
       })
   }
 
+  const uploadToIpfsCrustWrap = (content, filename) => {
+    uploadToIpfsCrust(content, filename)
+      .then(result => {
+        re(result.download_url)
+      })
+      .catch(error => {
+        console.info('error:', error)
+        rj('Upload failed, the image will be copied to the image folder')
+      })
+  }
+
   const uploadByCommand = async (uploader, filepath) => {
     let isPath = true
     if (typeof filepath !== 'string') {
@@ -209,6 +222,13 @@ export const uploadImage = async (pathname, image, preferences) => {
             uploadByGithub(base64, path.basename(imagePath))
             break
           }
+          case 'ipfsCrust': {
+            const imageFile = await fs.readFile(imagePath)
+            const imageBuffer = Buffer.from(imageFile).toString('base64')
+            // const { mime } = await fromBuffer(imageBuffer)
+            uploadToIpfsCrustWrap(imageBuffer, path.basename(imagePath))
+            break
+          }
         }
       }
     } else {
@@ -226,12 +246,16 @@ export const uploadImage = async (pathname, image, preferences) => {
           case 'cliScript':
             uploadByCommand(currentUploader, reader.result)
             break
+          case 'ipfsCrust': {
+            uploadToIpfsCrustWrap(reader.result, image.name)
+            break
+          }
           default:
             uploadByGithub(reader.result, image.name)
         }
       }
 
-      const readerFunction = currentUploader !== 'github' ? 'readAsArrayBuffer' : 'readAsDataURL'
+      const readerFunction = currentUploader !== 'github' && currentUploader !== 'ipfsCrust' ? 'readAsArrayBuffer' : 'readAsDataURL'
       reader[readerFunction](image)
     }
   }
