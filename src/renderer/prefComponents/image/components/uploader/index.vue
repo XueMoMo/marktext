@@ -64,6 +64,23 @@
           </el-button>
         </div>
       </div>
+      <div v-else-if="currentUploader === ipfsCrust">
+        <div class="form-group">
+          <div class="label">
+            Base64 Signature:
+            <el-tooltip class="item" effect="dark"
+              content="The token for auth upload image"
+              placement="top-start">
+              <i class="el-icon-info"></i>
+            </el-tooltip>
+          </div>
+          <el-input v-model="ipfsCrustToken" placeholder="Input token" size="mini"></el-input>
+        </div>
+        <div class="form-group">
+          <el-button size="mini" :disabled="ipfsCrustDisabled" @click="save('ipfsCrust')">Save
+          </el-button>
+        </div>
+      </div>
     </section>
   </div>
 </template>
@@ -98,6 +115,7 @@ export default {
         branch: ''
       },
       cliScript: '',
+      ipfsCrustToken: '',
       picgoExists: true,
       uploadServices: services,
       legalNoticesErrorStates: {
@@ -121,10 +139,18 @@ export default {
         return this.$store.state.preferences.githubToken
       }
     },
+    prefIpfsCrustToken: {
+      get: function () {
+        return this.$store.state.preferences.ipfsCrustToken
+      }
+    },
     prefCliScript: {
       get: function () {
         return this.$store.state.preferences.cliScript
       }
+    },
+    ipfsCrustDisabled () {
+      return !this.ipfsCrustToken
     },
     githubDisable () {
       return !this.githubToken || !this.github.owner || !this.github.repo
@@ -147,6 +173,7 @@ export default {
     this.$nextTick(() => {
       this.github = this.imageBed.github
       this.githubToken = this.prefGithubToken
+      this.ipfsCrustToken = this.prefIpfsCrustToken
       this.cliScript = this.prefCliScript
       this.testPicgo()
 
@@ -178,21 +205,31 @@ export default {
         type: 'imageBed',
         value: newImageBedConfig
       })
+      let message = 'saved'
       if (type === 'github') {
         this.$store.dispatch('SET_USER_DATA', {
           type: 'githubToken',
           value: this.githubToken
         })
+        message = 'The Github configration has been saved.'
       }
       if (type === 'cliScript') {
         this.$store.dispatch('SET_USER_DATA', {
           type: 'cliScript',
           value: this.cliScript
         })
+        message = 'The command line script configuration has been saved'
+      }
+      if (type === 'ipfsCrust') {
+        this.$store.dispatch('SET_USER_DATA', {
+          type: 'ipfsCrustToken',
+          value: this.ipfsCrustToken
+        })
+        message = 'The ipfs crust configuration has been saved'
       }
       notice.notify({
         title: 'Save Config',
-        message: type === 'github' ? 'The Github configration has been saved.' : 'The command line script configuration has been saved',
+        message,
         type: 'primary'
       })
     },

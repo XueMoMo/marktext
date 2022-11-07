@@ -152,7 +152,7 @@ export const uploadImage = async (pathname, image, preferences) => {
   }
 
   const uploadToIpfsCrustWrap = (content, filename) => {
-    uploadToIpfsCrust(content, filename)
+    uploadToIpfsCrust(content, filename, preferences.ipfsCrustToken)
       .then(result => {
         re(result.download_url)
       })
