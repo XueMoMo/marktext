@@ -75,10 +75,10 @@ jobs:
           yarn run lint
           yarn run validate-licenses
 
-      - name: Run unit and E2E tests
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: yarn run test
+      # - name: Run unit and E2E tests
+      #   uses: GabrielBB/xvfb-action@v1
+      #   with:
+      #     run: yarn run test
 
       - name: Build
         run: yarn build:bin
@@ -144,8 +144,8 @@ jobs:
           yarn run lint
           yarn run validate-licenses
 
-      - name: Run unit and E2E tests
-        run: yarn run test
+      # - name: Run unit and E2E tests
+      #   run: yarn run test
 
       - name: Build
         run: yarn build:bin
