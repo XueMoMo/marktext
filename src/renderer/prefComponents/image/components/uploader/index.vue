@@ -64,7 +64,7 @@
           </el-button>
         </div>
       </div>
-      <div v-else-if="currentUploader === ipfsCrust">
+      <div v-else-if="currentUploader === 'ipfsCrust'">
         <div class="form-group">
           <div class="label">
             Base64 Signature:
